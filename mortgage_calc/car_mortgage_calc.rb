@@ -58,8 +58,8 @@ loop do
       prompt(MESSAGES['get_amount'])
       amount = Kernel.gets().chomp()
 
-      if integer?(amount)
-        amount = amount.to_i
+      if number?(amount)
+        amount = amount.to_f
         break
       else
         prompt(MESSAGES['amount_error'])
@@ -111,12 +111,12 @@ loop do
 
   prompt(MESSAGES['m_int_statment'] + "#{format('%02.2f', m_int * 100)}%")
 
-    if duration == 0
-      prompt(MESSAGES['zero_duration'] + "#{format('%02.2f', amount)}")
-    else
-      prompt(MESSAGES['payment_plan_statement'] +
-    "#{format('%02.2f', monthly_payment(amount, m_int, duration))}.")
-    end
+  if duration == 0
+    prompt(MESSAGES['zero_duration'] + "format('%02.2f', amount)")
+  else
+    prompt(MESSAGES['payment_plan_statement'] +
+  "#{format('%02.2f', monthly_payment(amount, m_int, duration))}.")
+  end
   break unless run_again?
 end
 
