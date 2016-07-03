@@ -9,11 +9,12 @@
 def prompt(message)
   Kernel.puts("=> #{message}")
 end
-
+# Better way to validate number - include 0s and decimals?
 def valid_number?(num)
   num.to_i() != 0
 end
-
+# If the case statement weren't the end of this method, the value wouldn't get returned.
+# Better way to do this?
 def operation_to_message(op)
   case op
   when '1'
@@ -108,6 +109,6 @@ loop do # main loop
   break unless answer.downcase().start_with?('y')
 end
 
-prompt("Thank you for using calculator! Good bye!\n")
+prompt("Thank you for using calculator! Good bye!")
 
 \n
