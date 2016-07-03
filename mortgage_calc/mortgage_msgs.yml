@@ -19,15 +19,16 @@ apr_statement: "Okay,your APR is "
 get_duration: "How long is your loan in months?"
 duration_error: "Please enter a number of months as digits."
 duration_statement: "Great, looks like the duration of your loan is "
+zero_duration: "Aw snap, you need to pay up this month! You owe $"
 
 # Messages about the payment plan
 m_int_statment: "Great! Based on your information...
 
 
-Your monthly interest rate is "
+Your monthly interest rate rounds to "
 payment_plan_statement: "
 
-Your monthly loan payment should be "
+Your monthly loan payment should be $"
 # Messages to exit
 end_of_program: "Thank you for using our calculator. 
 Do you have another loan to calculate?

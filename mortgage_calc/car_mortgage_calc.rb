@@ -20,7 +20,7 @@ end
 def make_correction?
   loop do
     prompt(MESSAGES['check'])
-    answer = Kernel.gets().chomp()
+    answer = Kernel.gets().chomp().downcase()
     break false if %w(y yes).include?(answer)
     break true if %w(n no).include?(answer)
   end
@@ -29,15 +29,20 @@ end
 def monthly_payment(amount, m_int, duration)
   # Formula for monthly payments
   # P = L[c(1 + c)^n]/[(1 + c)^n - 1]
-  numerator = amount * ((m_int / 100) * (1 + (m_int / 100))**duration)
-  denominator = ((1 + (m_int / 100))**duration - 1).round(2)
+  if m_int == 0.0
+    numerator = amount
+    denominator = duration
+  else
+    numerator = amount * (m_int * (1 + m_int)**duration)
+    denominator = (1 + m_int)**duration - 1
+  end
   numerator / denominator
 end
 
 def run_again?
   loop do
     prompt(MESSAGES['end_of_program'])
-    answer = Kernel.gets().chomp()
+    answer = Kernel.gets().chomp().downcase()
     break true if %w(y yes).include?(answer)
     break false if %w(n no).include?(answer)
   end
@@ -60,7 +65,7 @@ loop do
         prompt(MESSAGES['amount_error'])
       end
     end
-    prompt(MESSAGES['amount_statment'].to_s + "#{amount}.")
+    prompt(MESSAGES['amount_statment'] + "#{amount}.")
     break unless make_correction?
   end
 
@@ -79,7 +84,7 @@ loop do
         prompt(MESSAGES['apr_error'])
       end
     end
-    prompt(MESSAGES['apr_statement'].to_s + "#{apr}%.")
+    prompt(MESSAGES['apr_statement'] + "#{apr}%.")
     break unless make_correction?
   end
 
@@ -98,15 +103,20 @@ loop do
         prompt(MESSAGES['duration_error'])
       end
     end
-    prompt(MESSAGES['duration_statement'].to_s + "#{duration} months.")
+    prompt(MESSAGES['duration_statement'] + "#{duration} months.")
     break unless make_correction?
   end
 
-  m_int = (apr / 12).round(2)
+  m_int = (apr / 100) / 12
 
-  prompt(MESSAGES['m_int_statment'].to_s + "#{m_int}%.")
-  prompt(MESSAGES['payment_plan_statement'].to_s +
-    "$#{monthly_payment(amount, m_int, duration).round(2)}.")
+  prompt(MESSAGES['m_int_statment'] + "#{format('%02.2f', m_int * 100)}%")
+
+    if duration == 0
+      prompt(MESSAGES['zero_duration'] + "#{format('%02.2f', amount)}")
+    else
+      prompt(MESSAGES['payment_plan_statement'] +
+    "#{format('%02.2f', monthly_payment(amount, m_int, duration))}.")
+    end
   break unless run_again?
 end
 
