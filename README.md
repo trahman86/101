@@ -17,3 +17,10 @@ Exploration of casual and formal psuedocode
 ### calculator.rb
 
 Simple 20 operation calculator. First coding small project in course 101.
+
+### Car Mortgage Calculator
+
+Small program using YAML config file for messages.
+
+#### car_mortgage_calc.rb
+#### mortgage_msgs.yml
