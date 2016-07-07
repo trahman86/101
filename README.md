@@ -1,26 +1,25 @@
-# 101-Lesson-2
+# 101
 
 ## Configuration Files
 
-### .rubocop
+#### .rubocop
 
 Customizing the offenses flagged by Rubocop analyzer
 
-## Lessons
+## Lesson 2 - Small Programs
 
-### psuedocode
+### mortage_calc
 
-Exploration of casual and formal psuedocode
-
-## Coding Exercises
-
-### calculator.rb
-
-Simple 20 operation calculator. First coding small project in course 101.
-
-### Car Mortgage Calculator
+#### Car Mortgage Calculator
 
 Small program using YAML config file for messages.
 
-#### car_mortgage_calc.rb
-#### mortgage_msgs.yml
+### RPS
+
+#### rps.rb
+Standard Rock Paper Scissors
+
+#### rpssl.rb
+Rock Paper Scissors Spock Lizard variation. Play up to 5 points per match.
+
+## Lesson 3 - Exercises
