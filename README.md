@@ -23,3 +23,6 @@ Standard Rock Paper Scissors
 Rock Paper Scissors Spock Lizard variation. Play up to 5 points per match.
 
 ## Lesson 3 - Exercises
+Useful reference material for syntactic nuance.
+
+## Lesson 4 - Slightly Larger Programs
