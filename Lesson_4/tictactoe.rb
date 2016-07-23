@@ -174,7 +174,6 @@ computer_score = 0
 loop do
   board = initialize_board
   current_player = who_goes_first(PLAY_MODE)
-  # current_player.inspect
   loop do
     display_board(board, player_score, computer_score)
     place_piece!(board, current_player)
