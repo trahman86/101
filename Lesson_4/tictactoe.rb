@@ -1,10 +1,5 @@
 require 'pry'
 
-# Tic Tac Toe is a 2 player game played on a 3x3 board. 
-# Each player takes a turn and marks a square on the board.
-# The first player to reach 3 squares in a row, including diagonals, wins.
-# If all 9 squares are marked and no player has 3 squares in a row, then the game is a tie.
-
 # 1. Display the initial empty 3x3 board.
 # 2. Ask the user to mark a square.
 # 3. Computer marks an available square.
@@ -14,18 +9,35 @@ require 'pry'
 # 7. If there is no winner or a tie, go back to #2.
 # 8. Ask if the player wants to play again.
 # 9. If yes, go back to #1.
-# 10. Say goodbye when they're done. 
+# 10. Say goodbye when they're done.
 
-INITIAL_MARKER = ' '
-PLAYER_MARKER = 'X'
-COMPUTER_MARKER = 'O'
+PLAY_MODE = 'choose'
+INITIAL_MARKER = " ".freeze
+PLAYER_MARKER = "X".freeze
+COMPUTER_MARKER = "O".freeze
+WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # row
+                [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
+                [[1, 5, 9], [3, 5, 7]].freeze # diagonals
 
 def prompt(msg)
   puts " => #{msg}"
 end
 
-def display_board(brd)
+def who_goes_first(pick)
+  choice = ''  
+  if pick == 'choose'
+    prompt "Pick if you would like to go first (1) or second (2)."
+    prompt "Type 1 for first and 2 for second"
+    choice = gets.chomp
+  else
+    choice = 2
+  end
+end
+
+# rubocop:disable Metrics/AbcSize
+def display_board(brd, player_score, computer_score)
   system 'clear'
+  puts "You're an #{PLAYER_MARKER}. Computer is a #{COMPUTER_MARKER}."
   puts ""
   puts "     |     |"
   puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}  "
@@ -38,24 +50,31 @@ def display_board(brd)
   puts "     |     |"
   puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}  "
   puts "     |     |"
+  prompt "The score is now Player: #{player_score} Computer: #{computer_score}"
 end
+# rubocop:enable Metrics/AbcSize
 
 def initialize_board
   new_board = {}
-  (1..9).each {|num| new_board[num] = INITIAL_MARKER}
+  (1..9).each { |num| new_board[num] = INITIAL_MARKER }
   new_board
 end
 
 def empty_squares(brd)
-  brd.keys.select {|num| brd[num] == INITIAL_MARKER}
+  brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+def joinor(brd, punctuation = ', ', conjunction = 'or')
+  empties = empty_squares(brd)
+  empties[-1] = "#{conjunction} #{empties.last}" if empties.size > 1
+  empties.size == 2 ? empties.join(' ') : empties.join(punctuation)
+end
 
 def player_places_piece!(brd)
   square = ''
 
   loop do
-    prompt "Choose a square (#{empty_squares(brd).join(', ')}):"
+    prompt "Choose a square (#{joinor(brd)}):"
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     prompt "Sorry, that's not a valid choice."
@@ -64,8 +83,50 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def find_square_to_block(line, brd)
+  if brd.values_at(*line).count(PLAYER_MARKER) == 2
+    brd.select { |key, value| line.include?(key) && value == ' '}.keys.first
+    # binding.pry
+  else
+    nil
+  end
+end
+
+def find_square_to_steal(line, brd)
+  if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && 
+     brd.values_at(*line).count(PLAYER_MARKER) == 0
+    brd.select { |key, value| line.include?(key) && value == ' '}.keys.first
+  else
+    nil
+  end
+end
+
+# def find_best_move(brd)
+#   binding.pry
+# end
+
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  square = nil
+
+  WINNING_LINES.each do |line|
+    square = find_square_to_steal(line, brd)
+    if square
+      break
+    else
+      square = find_square_to_block(line, brd)
+      break if square
+    end  
+  end
+
+  # square = find_best_move(brd)
+  if square
+    brd[square] = COMPUTER_MARKER
+  elsif brd[5]==' '
+    square = 5
+  else
+   square = empty_squares(brd).sample
+  end
+  # binding.pry
   brd[square] = COMPUTER_MARKER
 end
 
@@ -74,17 +135,85 @@ def board_full?(brd)
 end
 
 def someone_won?(brd)
-  false
+  !!detect_winner(brd)
 end
 
-board = initialize_board
-display_board(board)
+def detect_winner(brd)
+  WINNING_LINES.each do |line|
+    if brd.values_at(*line).count(PLAYER_MARKER) == 3
+      return 'Player'
+    elsif brd.values_at(*line).count(COMPUTER_MARKER) == 3
+      return 'Computer'
+    end
+  end
+  nil
+end
+
+def run_again?
+  loop do
+    prompt("Do you want to play again? Y for yes, N for no.")
+    answer = gets.chomp.downcase
+    break true if %w(y yes).include?(answer)
+    break false if %w(n no).include?(answer)
+    prompt("I didn't understand.")
+  end
+end
+
+
+player_score = 0
+computer_score = 0
 
 loop do
-  player_places_piece!(board)
-  computer_places_piece!(board)
-  puts board.inspect
-  display_board(board)
-  break if someone_won?(board) || board_full?(board)
+  choice = who_goes_first(PLAY_MODE)
+  board = initialize_board
+
+  loop do
+    display_board(board, player_score, computer_score)
+    if choice == "1"
+      prompt "Player moves first."
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    else
+      computer_places_piece!(board)
+      display_board(board, player_score, computer_score)
+      prompt "Computer moves first."
+      break if someone_won?(board) || board_full?(board)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
+  end
+
+  display_board(board, player_score, computer_score)
+
+  if someone_won?(board)
+    prompt"#{detect_winner(board)} won!"
+  else
+    prompt "It's a tie!"
+  end
+
+  # Update the scores at the end of the round
+  if detect_winner(board) == 'Player'
+    player_score += 1
+  elsif detect_winner(board) == 'Computer'
+    computer_score += 1
+  else
+    computer_score += 1
+    player_score += 1
+  end
+
+  # Determine if someone has won 5 points (ties count as a point)
+  if player_score == 5
+    prompt("You won 5 points! Good game.")
+    player_score = 0
+    computer_score = 0
+  elsif computer_score == 5
+    prompt("The computer won 5 points! Good game.")
+    player_score = 0
+    computer_score = 0
+  end
+  break unless run_again?
 end
-display_board(board)
+
+prompt "Thanks for playing Tic Tac Toe! Goodbye."
