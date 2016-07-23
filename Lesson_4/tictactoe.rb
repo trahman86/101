@@ -11,7 +11,7 @@ require 'pry'
 # 9. If yes, go back to #1.
 # 10. Say goodbye when they're done.
 
-PLAY_MODE = 'choose'
+PLAY_MODE = 'choose'.freeze
 INITIAL_MARKER = " ".freeze
 PLAYER_MARKER = "X".freeze
 COMPUTER_MARKER = "O".freeze
@@ -24,13 +24,19 @@ def prompt(msg)
 end
 
 def who_goes_first(pick)
-  choice = ''  
+  turn_choice = ''
   if pick == 'choose'
-    prompt "Pick if you would like to go first (1) or second (2)."
-    prompt "Type 1 for first and 2 for second"
-    choice = gets.chomp
+    loop do
+      prompt "Type 1 to go first and 2 to go second"
+      turn_choice = gets.chomp
+      break if ["1", "2"].include?(turn_choice)
+      prompt "Please choose either 1 or 2 for the order of your turn."
+    end
+  end
+  if turn_choice == '1'
+    'Player'
   else
-    choice = 2
+    'Computer'
   end
 end
 
@@ -85,49 +91,52 @@ end
 
 def find_square_to_block(line, brd)
   if brd.values_at(*line).count(PLAYER_MARKER) == 2
-    brd.select { |key, value| line.include?(key) && value == ' '}.keys.first
-    # binding.pry
-  else
-    nil
+    brd.select { |key, value| line.include?(key) && value == ' ' }.keys.first
   end
 end
 
 def find_square_to_steal(line, brd)
-  if brd.values_at(*line).count(COMPUTER_MARKER) == 2 && 
+  if brd.values_at(*line).count(COMPUTER_MARKER) == 2 &&
      brd.values_at(*line).count(PLAYER_MARKER) == 0
-    brd.select { |key, value| line.include?(key) && value == ' '}.keys.first
-  else
-    nil
+    brd.select { |key, value| line.include?(key) && value == ' ' }.keys.first
   end
 end
-
-# def find_best_move(brd)
-#   binding.pry
-# end
 
 def computer_places_piece!(brd)
   square = nil
 
   WINNING_LINES.each do |line|
     square = find_square_to_steal(line, brd)
-    if square
-      break
-    else
-      square = find_square_to_block(line, brd)
-      break if square
-    end  
+    break if square
+    square = find_square_to_block(line, brd)
+    break if square
   end
 
-  # square = find_best_move(brd)
   if square
     brd[square] = COMPUTER_MARKER
-  elsif brd[5]==' '
+  elsif brd[5] == ' '
     square = 5
   else
-   square = empty_squares(brd).sample
+    square = empty_squares(brd).sample
   end
-  # binding.pry
   brd[square] = COMPUTER_MARKER
+end
+
+def place_piece!(brd, player)
+  if player == 'Player'
+    prompt "Your turn."
+    player_places_piece!(brd)
+  elsif player == 'Computer'
+    computer_places_piece!(brd)
+  end
+end
+
+def alternate_player(current_player)
+  if current_player == 'Player'
+    'Computer'
+  else
+    'Player'
+  end
 end
 
 def board_full?(brd)
@@ -159,30 +168,18 @@ def run_again?
   end
 end
 
-
 player_score = 0
 computer_score = 0
 
 loop do
-  choice = who_goes_first(PLAY_MODE)
   board = initialize_board
-
+  current_player = who_goes_first(PLAY_MODE)
+  # current_player.inspect
   loop do
     display_board(board, player_score, computer_score)
-    if choice == "1"
-      prompt "Player moves first."
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-      computer_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-    else
-      computer_places_piece!(board)
-      display_board(board, player_score, computer_score)
-      prompt "Computer moves first."
-      break if someone_won?(board) || board_full?(board)
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-    end
+    place_piece!(board, current_player)
+    current_player = alternate_player(current_player)
+    break if someone_won?(board) || board_full?(board)
   end
 
   display_board(board, player_score, computer_score)
