@@ -102,16 +102,24 @@ def find_square_to_steal(line, brd)
   end
 end
 
-def computer_places_piece!(brd)
+def find_best_move(brd)
   square = nil
 
   WINNING_LINES.each do |line|
     square = find_square_to_steal(line, brd)
     break if square
-    square = find_square_to_block(line, brd)
-    break if square
   end
 
+  if square.nil?
+    WINNING_LINES.each do |line|
+      square = find_square_to_block(line, brd)
+      break if square
+    end
+  end
+  square
+end
+
+def computer_places_piece!(brd, square)
   if square
     brd[square] = COMPUTER_MARKER
   elsif brd[5] == ' '
@@ -127,7 +135,7 @@ def place_piece!(brd, player)
     prompt "Your turn."
     player_places_piece!(brd)
   elsif player == 'Computer'
-    computer_places_piece!(brd)
+    computer_places_piece!(brd, find_best_move(brd))
   end
 end
 
