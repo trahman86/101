@@ -51,18 +51,18 @@ def detect_result(d_total, p_total)
   end
 end
 
-def update_match_score(result)
+def update_match_score(result, d_matches_won, p_matches_won)
   case result
-  when :player_busted || :dealer_wins
+  when :player_busted, :dealer_wins
     d_matches_won << 1
-  when :dealer_busted || :player_wins
+  when :dealer_busted, :player_wins
     p_matches_won << 1
   end
 end
 
-def display_result(d_total, p_total)
+def display_result(d_total, p_total, d_matches_won, p_matches_won)
   result = detect_result(d_total, p_total)
-  update_match_score(result)
+  update_match_score(result, d_matches_won, p_matches_won)
 
   case result
   when :player_busted
