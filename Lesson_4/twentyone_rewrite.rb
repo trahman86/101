@@ -112,21 +112,21 @@ def play_again?
   puts "------------"
   prompt "Do you want to play again? (y or n)"
   answer = gets.chomp
-  valid = ['y','n'].include?(answer)
+  valid = ['y', 'n'].include?(answer)
   unless valid
-    prompt "Sorry, must enter 'y' or 'n'." 
+    prompt "Sorry, must enter 'y' or 'n'."
   end
   answer.downcase.start_with?('y')
 end
 
 def exit_game?
   puts "------------"
-  prompt "Are you sure you want to exit Twenty-One? 
+  prompt "Are you sure you want to exit Twenty-One?
   Press 'y' to exit and 'n' to start a new game."
   answer = gets.chomp
-  valid = ['y','n'].include?(answer)
+  valid = ['y', 'n'].include?(answer)
   unless valid
-    prompt "Sorry, must enter 'y' or 'n'." 
+    prompt "Sorry, must enter 'y' or 'n'."
   end
   answer.downcase.start_with?('y')
 end
