@@ -1,3 +1,5 @@
+require 'pry'
+
 SUITS = ['Hearts', 'Diamonds', 'Spades', 'Clubs'].freeze
 VALUES = ['2', '3', '4,', '5', '6', '7', '8', '9', '10', 'Jack',
           'Queen', 'King', 'Ace'].freeze
@@ -110,6 +112,22 @@ def play_again?
   puts "------------"
   prompt "Do you want to play again? (y or n)"
   answer = gets.chomp
+  valid = ['y','n'].include?(answer)
+  unless valid
+    prompt "Sorry, must enter 'y' or 'n'." 
+  end
+  answer.downcase.start_with?('y')
+end
+
+def exit_game?
+  puts "------------"
+  prompt "Are you sure you want to exit Twenty-One? 
+  Press 'y' to exit and 'n' to start a new game."
+  answer = gets.chomp
+  valid = ['y','n'].include?(answer)
+  unless valid
+    prompt "Sorry, must enter 'y' or 'n'." 
+  end
   answer.downcase.start_with?('y')
 end
 
@@ -195,8 +213,8 @@ loop do
     puts "============="
 
     match_won(d_total, p_total, d_matches_won, p_matches_won)
-
     break unless play_again?
   end
+  break if exit_game?
 end
 prompt "Thank you for playing Twenty-One! Good bye!"
